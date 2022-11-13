@@ -4,6 +4,7 @@ import {FontAwesome5} from '@expo/vector-icons';
 import quotes from '../data/quote.json';
 import { Card, CardTitle, CardContent} from 'react-native-material-cards';
 import { LineChart} from 'react-native-chart-kit';
+import { getTimestamp } from 'react-native-reanimated/lib/reanimated2/core';
 
 
 
@@ -16,16 +17,10 @@ const Home = (props) => {
 const todayScore = async() =>{
   let scoreObject ={};
   try{
-    const tokenResponse = await fetch('https://dev.stedi.me/login',{
-  method: 'POST',
-  body:JSON.stringify({
-    userName: "rom19010@byui.edu",
-    password:"Patricia2596@"
-  })
-});
-
- token.current = await tokenResponse.text();
-    const scoreResponse = await fetch('https://dev.stedi.me/riskscore/rom19010@byui.edu',{
+    const sessionToken = await AsyncStorage.getItem('sessionToken')
+    const username = await AsyncStorage.getItem('username')
+    token.current = sessionToken;
+    const scoreResponse = await fetch('https://dev.stedi.me/riskscore/' +username,{
     method:'GET',
     headers:{
       'Content-Type': 'application/json',

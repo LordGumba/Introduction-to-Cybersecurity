@@ -1,5 +1,5 @@
 import React, { useEffect, useState, } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, Button } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, Button, Alert } from 'react-native';
 import  Navigation from './components/Navigation';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import OnboardingScreen from './screens/OnboardingScreen';
@@ -23,7 +23,26 @@ const App = () =>{
   const [phoneNumber, setPhoneNumber] = React.useState("");
   const [oneTimePassword, setOneTimePassword] = React.useState(null);
 
-
+  useEffect(()=>{
+    const getSessionToken = async()=>{
+    const sessionToken = await AsyncStorage.getItem('SessionToken');
+    console.log('sessionToken', sessionToken);
+    const validateResponse = await fetch('https://dev.stedi.me/validate/'+sessionToken,
+    {
+      method: 'GET',
+      headers: {
+        'content-type':'application/text'
+      }
+    });
+    
+  if(validateResponse.status==200){
+    const userName = await validateResponse.text();
+    await AsyncStorage.setItem('userName', userName);
+    setLoggedInState(loggedinStates.LOGGED_IN);
+  }
+  }
+  getSessionToken();
+  });
    if (isFirstLaunch == true){
 return(
   <OnboardingScreen setFirstLaunch={setFirstLaunch}/>
@@ -73,8 +92,8 @@ return(
                 style={styles.input}
                 placeholderTextColor='#4251f5'
                 placeholder='One Time Password'
-                value={phoneNumber}
-                onChangeText={setPhoneNumber}
+                value={oneTimePassword}
+                onChangeText={setOneTimePassword}
                 keyboardType = "numeric"
               >
               </TextInput>
@@ -83,7 +102,7 @@ return(
                 style={styles.button}
                 onPress={async()=>{
                   console.log('Login Button was pressed!')
-                  const loginResponse=await fetch('https://dev.stedi.me/twofactorlogin/',
+                  const loginResponse=await fetch('https://dev.stedi.me/twofactorlogin',
                   {
                     method:'POST',
                     headers:{
@@ -96,8 +115,14 @@ return(
                 })
                 });
               if(loginResponse.status==200){//200 means the password was valid
-              setLoggedInState(loggedinStates.LOGGED_IN);
+                const sessionToken = await loginResponse.text();
+                await AsyncStorage.setItem('sessionToken', sessionToken)
+                setLoggedInState(loggedinStates.LOGGED_IN);
                } else{
+                console.log('response status', loginResponse.status);
+                console.log('OneTimePassword', oneTimePassword);
+                console.log('PhoneNumber', phoneNumber);
+                Alert.alert('Invalid', 'Invalid login information')
                 setLoggedInState(loggedinStates.NOT_LOGGED_IN);
                }
               //setLoggedInState(loggedinStates.CODE_SENT)
