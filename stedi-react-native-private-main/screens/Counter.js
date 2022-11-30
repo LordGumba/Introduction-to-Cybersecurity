@@ -68,7 +68,7 @@ const startTime = useRef(0);
 const stopTime = useRef(0);
 const testTime = useRef(0);
 const token = useRef("");
-const username
+const userName = useRef("");
 
 
 const savingSteps = async(event) =>{
