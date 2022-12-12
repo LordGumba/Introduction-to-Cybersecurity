@@ -5,7 +5,7 @@ import quotes from '../data/quote.json';
 import { Card, CardTitle, CardContent} from 'react-native-material-cards';
 import { LineChart} from 'react-native-chart-kit';
 import { getTimestamp } from 'react-native-reanimated/lib/reanimated2/core';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const Home = (props) => {

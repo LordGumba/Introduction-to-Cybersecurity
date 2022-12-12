@@ -26,7 +26,7 @@ const App = () =>{
 
   useEffect(()=>{
     const getSessionToken = async()=>{
-    const sessionToken = await AsyncStorage.getItem('SessionToken');
+    const sessionToken = await AsyncStorage.getItem('sessionToken');
     console.log('sessionToken', sessionToken);
     const validateResponse = await fetch('https://dev.stedi.me/validate/'+sessionToken,
     {
@@ -117,6 +117,7 @@ return(
                 });
               if(loginResponse.status==200){//200 means the password was valid
                 const sessionToken = await loginResponse.text();
+                console.log('token responce', sessionToken);
                 await AsyncStorage.setItem('sessionToken', sessionToken)
                 setLoggedInState(loggedinStates.LOGGED_IN);
                } else{

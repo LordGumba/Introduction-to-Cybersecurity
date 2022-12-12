@@ -1,9 +1,9 @@
 
 import React, { useEffect, useState, useRef} from 'react';
-import { StyleSheet, Text, View, Image, SafeAreaView , Share, ScrollView, Button} from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, Image, SafeAreaView , Share, ScrollView, Button} from 'react-native';
 import { Card, CardTitle, CardContent} from 'react-native-material-cards';
 import BarChart from 'react-native-bar-chart';
-import {Camera} from 'expo-camera';
+import {Camera, CameraType} from 'expo-camera';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // import Share from 'react-native-share';
 
@@ -38,7 +38,7 @@ const Profile = (props) => {
       console.log('userName', userName);
       setUserName(userName);
       const profilePhoto = await AsyncStorage.getItem('profilePhoto');
-      sertProfilePhoto(profilePhoto);
+      setProfilePhoto(profilePhoto);
 
     };
     getUserInfo();
@@ -64,20 +64,21 @@ if(profilePhoto==null){
   
   return(
     <View style={styles.container}>
-      <Camera style ={styles.camera} ref={cameraRef} onCameraReady={()=>{setCameraReady(true)}}>
+      <Camera type={CameraType.front} style={styles.camera} ref={cameraRef} onCameraReady={()=>{setCameraReady(true)}}>
         <View style={styles.buttonContainer}>
-          {cameraReady?<TouchableOpacity style={styles.button} onPress={async ()=>{
+          {cameraReady?<TouchableOpacity style={styles.button} onPress={async ()=> {
 
             const picture = await cameraRef.current.takePictureAsync(cameraOptions);
-            console.log('Picture', picture);
-            await AsyncStorage.setItem('profilePhoto', picture.uri);
+            console.log('Picture',picture);
+            await AsyncStorage.setItem('profilePhoto',picture.uri);
             setProfilePhoto(picture.uri);
           }}>
-            <Text style={styles.text}></Text>
+            <Text style={styles.text}>Take Picture</Text>
           </TouchableOpacity>: null}
         </View>
       </Camera>
     </View>
+   );
 } else{
   return (
     <SafeAreaView style={{flex: 1}}>
@@ -92,8 +93,8 @@ shadowRadius: 2.62,
 elevation: 4}}>
      <CardContent>
      <Image style={{height: 100, width:100, borderRadius: 75}}
-      source={require('../image/me.jpg')} />
-    <Text style={{marginTop:10,marginBottom:10,fontWeight: 'bold'}}>Sarah Romero</Text>
+      source={{uri:profilePhoto}} />
+    <Text style={{marginTop:10,marginBottom:10,fontWeight: 'bold'}}>UserName</Text>
 
     <Text style={{marginTop:20,marginBottom:2}}>This Week's progress</Text>
 {/* <BarChart barColor='green' data={data} horizontalData={horizontalData} /> */}
@@ -106,9 +107,30 @@ elevation: 4}}>
   )};
 };
 export default Profile;
-const styles = StyleSheet.create({
-  container:{
-    flex:1,
-    padding:20
-  }
-})
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      padding: 65
+    },
+    camera: {
+      flex: 1,
+    },
+    buttonContainer: {
+      flex: 1,
+      flexDirection: 'row',
+      backgroundColor: 'transparent',
+      margin: 75,
+    },
+    button: {
+      flex: 1,
+      alignSelf: 'flex-end',
+      alignItems: 'center',
+    },
+    text: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: 'white',
+    },
+  });
